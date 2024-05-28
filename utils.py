@@ -1,4 +1,4 @@
-from nltk import sent_tokenize
+# from nltk import sent_tokenize
 from rouge_chinese import Rouge
 import jieba, nltk
 
