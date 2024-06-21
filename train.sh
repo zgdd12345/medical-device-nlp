@@ -1,4 +1,7 @@
-python train.py --model_path ./hub/Bert-chinese-Summarization --output_path ./results/bert --epoch 10 --runs ./runs/bert_base
-python train.py --model_path ./hub/HeackMT5-ZhSum100k --output_path ./results/heackmt5 --epoch 10 --runs ./runs/heackmt5
-python train.py --model_path ./hub/Randeng-Pegasus-238M-Summary-Chinese --output_path ./results/randeng238 --epoch 10 --runs ./runs/randeng238
-
+# python train.py --model mt5         --epoch 10 --batchsize 16 --e_batchsize 32
+# python train.py --model bert        --epoch 10 --batchsize 16 --e_batchsize 32
+# python train.py --model T5_base     --epoch 10 --batchsize 32 --e_batchsize 64
+# python train.py --model T5_large    --epoch 10 --batchsize 2 --e_batchsize 2
+# python train.py --model pegasus_238 --epoch 10 --batchsize 32 --e_batchsize 64
+# python train.py --model pegasus_523 --epoch 10 --batchsize 8 --e_batchsize 16
+python train.py --model heackmt5    --epoch 10 --batchsize 4 --e_batchsize 4
