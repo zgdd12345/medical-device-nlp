@@ -1,101 +1,64 @@
-# medical-device-nlp
+# medical report nlp
 
-## 20240621 add API 
+## Requirements
+    datasets==2.20.0
+    huggingface-hub==0.23.4
+    jieba==0.42.1
+    nltk==3.9.1
+    numpy==1.26.0
+    pandas==2.2.2
+    rouge==1.0.1
+    rouge-chinese==1.0.3
+    tokenizers==0.19.1
+    torch==2.3.1
+    torchaudio==2.3.1
+    torchvision==0.18.1
+    tornado==6.4.1
+    tqdm==4.66.4
+    transformers==4.42.3
 
-**library:** FastAPI
-**Usage:**
-uvicorn main:app --host 0.0.0.0 --port 11234
-
-curl -X POST http://www.arclighttest.com:11234/generate -H "Content-Type: application/json" -d '{"text": ["2023.4.14患者进行气管插管的口腔护理时，第一次使用止血钳进行拧干棉球操作，突然中间断裂无法使用，不能对棉球拧干吗，立即更换护理包，继续为患者进行口腔护理，此次事件未对患者造成损害","2023年4月8日，科室在使用注射泵过程中，发现设备停止工作。科室立刻停止使用，报修给设备科，设备维修人员检查发现设备供电接口碎裂故障，导致设备插头无法固定供电不稳，维修接口后修复。对患者的注射治疗造成延误。","2023.04.18患者郭京梅因腹痛收入我院，护士在给患者进行静脉输液时，给患者进行留置针正压接头端消毒，发现回弹头无法回弹，接上输液器时碘伏能流进留置针里，立即更换新的留置针，未对患者造成伤害。","2023年4月16日，患者因龋齿来院就诊，医生在给患者做显微根管治疗术时，发现灯泡不亮了，联系设备科。","2023.1.6护理在为患者输液准备时，发现输液器茂菲滴管里面的阀弹不上去，立即更换，未对患者造成伤害","患者因皮脂腺感染所致肿物于2023年3月30日入院，入院进行切除后进行包扎，打开凡士林纱布时发现其与包装袋黏连，随即更换新的油纱。"]}'
 
 
+## Data Preparation
 
-## Getting started
+You should split your data into train and test data
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+    data
+    └───train.csv
+    └───test.csv
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-## Add your files
+## Training
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Training Help
 
-```
-cd existing_repo
-git remote add origin http://www.arclighttest.cn:8090/sinopharm/medical_device/medical-device-nlp.git
-git branch -M main
-git push -uf origin main
-```
+    usage: Train [-h] [--data_path DATA_PATH]
+                [--model {mt5,bert,T5_base,T5_large,pegasus_238,pegasus_523,heackmt5}]
+                [--output_path OUTPUT_PATH] [--runs RUNS] [--epoch EPOCH]
+                [--batchsize BATCHSIZE] [--e_batchsize E_BATCHSIZE]
 
-## Integrate with your tools
+    options:
+    -h, --help            show this help message and exit
+    --data_path DATA_PATH
+                            data path
+    --model {mt5,bert,T5_base,T5_large,pegasus_238,pegasus_523,heackmt5}
+                            model path
+    --output_path OUTPUT_PATH
+                            output path
+    --runs RUNS           output path
+    --epoch EPOCH         epoches
+    --batchsize BATCHSIZE
+                            batch size
+    --e_batchsize E_BATCHSIZE
+                            eval batch size
 
-- [ ] [Set up project integrations](http://www.arclighttest.cn:8090/sinopharm/medical_device/medical-device-nlp/-/settings/integrations)
 
-## Collaborate with your team
+### Sample Usage
+    python train.py --model mt5 --output_path ./results/mt5 --epoch 10 --runs ./runs/mt5 --batchsize 32
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+or you can write a shell scripts
 
-## Test and Deploy
 
-Use the built-in continuous integration in GitLab.
+### Pre-training model
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+You can download the pre-training model weights of you need from huggingface
