@@ -61,4 +61,4 @@ or you can write a shell scripts
 
 ### Pre-training model
 
-You can download the pre-training model weights of you need from huggingface
+You can download the pre-training model weight from huggingface
