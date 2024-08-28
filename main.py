@@ -71,7 +71,7 @@ class RiskWarning:
         # self._save_csv(out_summary=False, out_words=True)
         risk_summary = self.inference()
         # self._save_csv(out_summary=True, out_words=True)
-        return {'summary':risk_words, 'words':risk_summary}
+        return {'summary':risk_summary, 'words':risk_words,}
  
     def inference(self):
         # self.source_model = self.model_path[self.model]
@@ -158,7 +158,7 @@ class RiskWarning:
 class TextGenerationRequest(BaseModel):
     text: list
     model: str = 'mt5'
-    
+
     min_length: int = 15
     max_length: int = 60
     temperature: float = 1.0
@@ -167,11 +167,10 @@ class TextGenerationRequest(BaseModel):
 
 @app.post("/generate")
 def generate_risk_warning(request:TextGenerationRequest):
-    source_model = './results/mt5'
 
     try:
         # riskwarning = RiskWarning(request, source_model).inference()
-        riskwarning = RiskWarning(request, source_model).run()
+        riskwarning = RiskWarning(request).run()
         print(riskwarning)
         return {"generated_text": riskwarning}
     except Exception as e:
@@ -220,4 +219,4 @@ if '__main__' == __name__:
 # 
 # curl -X POST http://localhost:8000/generate -H "Content-Type: application/json" -d '{"text": ["2023.4.14患者进行气管插管的口腔护理时，第一次使用止血钳进行拧干棉球操作，突然中间断裂无法使用，不能对棉球拧干吗，立即更换护理包，继续为患者进行口腔护理，此次事件未对患者造成损害",]}'
 # curl -X POST http://localhost:8000/generate -H "Content-Type: application/json" -d '{"text": ["2023.4.14患者进行气管插管的口腔护理时，第一次使用止血钳进行拧干棉球操作，突然中间断裂无法使用，不能对棉球拧干吗，立即更换护理包，继续为患者进行口腔护理，此次事件未对患者造成损害"], "max_length": 100, "temperature": 0.7}'
-# curl -X POST http://www.arclighttest.com:11234/generate -H "Content-Type: application/json" -d '{"text": ["2023.4.14患者进行气管插管的口腔护理时，第一次使用止血钳进行拧干棉球操作，突然中间断裂无法使用，不能对棉球拧干吗，立即更换护理包，继续为患者进行口腔护理，此次事件未对患者造成损害","2023年4月8日，科室在使用注射泵过程中，发现设备停止工作。科室立刻停止使用，报修给设备科，设备维修人员检查发现设备供电接口碎裂故障，导致设备插头无法固定供电不稳，维修接口后修复。对患者的注射治疗造成延误。","2023.04.18患者郭京梅因腹痛收入我院，护士在给患者进行静脉输液时，给患者进行留置针正压接头端消毒，发现回弹头无法回弹，接上输液器时碘伏能流进留置针里，立即更换新的留置针，未对患者造成伤害。","2023年4月16日，患者因龋齿来院就诊，医生在给患者做显微根管治疗术时，发现灯泡不亮了，联系设备科。","2023.1.6护理在为患者输液准备时，发现输液器茂菲滴管里面的阀弹不上去，立即更换，未对患者造成伤害","患者因皮脂腺感染所致肿物于2023年3月30日入院，入院进行切除后进行包扎，打开凡士林纱布时发现其与包装袋黏连，随即更换新的油纱。"]}'
+# curl -X POST http://www.arclighttest.cn:11234/generate -H "Content-Type: application/json" -d '{"text": ["2023.4.14患者进行气管插管的口腔护理时，第一次使用止血钳进行拧干棉球操作，突然中间断裂无法使用，不能对棉球拧干吗，立即更换护理包，继续为患者进行口腔护理，此次事件未对患者造成损害","2023年4月8日，科室在使用注射泵过程中，发现设备停止工作。科室立刻停止使用，报修给设备科，设备维修人员检查发现设备供电接口碎裂故障，导致设备插头无法固定供电不稳，维修接口后修复。对患者的注射治疗造成延误。","2023.04.18患者郭京梅因腹痛收入我院，护士在给患者进行静脉输液时，给患者进行留置针正压接头端消毒，发现回弹头无法回弹，接上输液器时碘伏能流进留置针里，立即更换新的留置针，未对患者造成伤害。","2023年4月16日，患者因龋齿来院就诊，医生在给患者做显微根管治疗术时，发现灯泡不亮了，联系设备科。","2023.1.6护理在为患者输液准备时，发现输液器茂菲滴管里面的阀弹不上去，立即更换，未对患者造成伤害","患者因皮脂腺感染所致肿物于2023年3月30日入院，入院进行切除后进行包扎，打开凡士林纱布时发现其与包装袋黏连，随即更换新的油纱。"]}'
