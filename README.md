@@ -1,4 +1,4 @@
-# medical report nlp
+# Enhancing Medical Data Analysis through Automated Summarization of Adverse Event Reports Using Large Language Models
 
 ## Requirements
     datasets==2.20.0
