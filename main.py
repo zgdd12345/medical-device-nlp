@@ -19,10 +19,16 @@ app = FastAPI()
 class RiskWarning:
     def __init__(self, request) -> None:
         self.request = request
-        self.data = request.text
-        self.model = request.model
-        
-        # self.source_model = source_model
+        # self.data = request.text
+        self.model_name = request.model
+        self.batch_size = request.batch_size
+
+        if request.path != '':
+            self.data = pd.read_csv(request.path).iloc[:, 1].tolist()
+        else:
+            self.data = request.text
+        # print(self.file[0])
+        # print(self.data[0])
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -71,15 +77,33 @@ class RiskWarning:
         # self._save_csv(out_summary=False, out_words=True)
         risk_summary = self.inference()
         # self._save_csv(out_summary=True, out_words=True)
+        with open('./test/output.txt', 'w') as f:
+            for s in risk_summary:
+                f.write(s + '\n')
         return {'summary':risk_summary, 'words':risk_words,}
  
     def inference(self):
         # self.source_model = self.model_path[self.model]
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path[self.model], cache_dir = self.model_path[self.model], use_fast=False)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_path[self.model], cache_dir = self.model_path[self.model]).to(self.device)
-
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_path[self.model_name], 
+            cache_dir = self.model_path[self.model_name], 
+            use_fast=False, 
+            # batch_size=self.batch_size 
+            )
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(
+            self.model_path[self.model_name], 
+            cache_dir = self.model_path[self.model_name]
+            ).to(self.device)
+        # self.model = torch.nn.DataParallel(self.model)
+        
         res = []
-        for text in tqdm(self.data, ncols=100):
+        # for i in tqdm(range(len(self.data)//self.batch_size ), ncols=100):
+        #     if self.batch_size*i+self.batch_size  < len(self.data):
+        #         text = self.data[self.batch_size*i: self.batch_size*i+self.batch_size ]
+        #     else:
+        #         text = self.data[self.batch_size*i:]
+
+        for text in tqdm(self.data, ncols=60):
             input_ids = self.tokenizer.encode(text, return_tensors='pt').to(self.device)
             summary_ids = self.model.generate(input_ids,
                                         min_length=15,
@@ -94,9 +118,12 @@ class RiskWarning:
                                         temperature = 0.8,
                                         top_k = 50,
                                         top_p = 0.95)
-            
+            # summary_text = []
+            # for s in summary_ids:
+            #     s_text = self.tokenizer.decode(s, skip_special_tokens=True)
+            #     summary_text.append(s_text)
             summary_text = self.tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-            # print(summary_text)
+            print(summary_text)
             res.append(summary_text)
         return res
 
@@ -122,6 +149,7 @@ class RiskWarning:
             risk_words_list.append(risk_words)
 
         return risk_words_list
+
 
     # def _read_riskdict(self):
     #     words = set()
@@ -157,7 +185,10 @@ class RiskWarning:
 
 class TextGenerationRequest(BaseModel):
     text: list
+
+    path: str = '' # './data/medical/test.csv'
     model: str = 'mt5'
+    batch_size: int = 64
 
     min_length: int = 15
     max_length: int = 60
@@ -167,11 +198,10 @@ class TextGenerationRequest(BaseModel):
 
 @app.post("/generate")
 def generate_risk_warning(request:TextGenerationRequest):
-
     try:
         # riskwarning = RiskWarning(request, source_model).inference()
         riskwarning = RiskWarning(request).run()
-        print(riskwarning)
+        # print(riskwarning)
         return {"generated_text": riskwarning}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -179,17 +209,6 @@ def generate_risk_warning(request:TextGenerationRequest):
 # @app.get("/items/{item_id}")
 # async def read_item(item_id):
 #     return {"item_id": item_id}
-
-
-model_path = {
-    'mt5':'./results/mt5',
-    'bert':'./results/bert',
-    # 'T5_base':'./results/T5_base',
-    'T5_large':'./results/T5_large',
-    # 'pegasus_238':'./hub/Randeng-Pegasus-238M-Summary-Chinese',
-    # 'pegasus_523':'./hub/Randeng-Pegasus-523M-Summary-Chinese',
-    # 'heackmt5':'./hub/HeackMT5-ZhSum100k',
-}
 
 if '__main__' == __name__:
     uvicorn.run(app, host='0.0.0.0', port=11234)

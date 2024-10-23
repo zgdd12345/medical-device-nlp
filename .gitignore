@@ -6,4 +6,5 @@ test-mt5-finetuned-lscts
 epoch30-mt5-finetuned-lscts-1201
 data
 bert
+test
 
